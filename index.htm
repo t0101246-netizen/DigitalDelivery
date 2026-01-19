@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PCM 電子簽章專案管理儀表板 v3.2 (工程修正版)</title>
+    <title>PCM 電子簽章專案管理儀表板 v4.1 (UI優化版)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
     <style>
@@ -87,111 +87,28 @@
 
         .hidden { display: none !important; }
 
-        /* --- 1. Gantt Chart Styles (Fixed) --- */
-        .gantt-container {
-            width: 100%;
-            overflow-x: auto;
-            border: 1px solid #eee;
-            margin-top: 20px;
-        }
-        .gantt-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1000px;
-            table-layout: fixed; /* 關鍵修正：強制欄寬固定 */
-        }
-        .gantt-header th {
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            padding: 10px;
-            font-size: 0.9rem;
-            width: 14%; /* 修正：100% / 7欄 (1欄名稱+6欄月份) */
-            text-align: center;
-        }
-        /* 第一欄工作項目寬度稍大 */
+        /* --- Gantt Styles --- */
+        .gantt-container { width: 100%; overflow-x: auto; border: 1px solid #eee; margin-top: 20px; }
+        .gantt-table { width: 100%; border-collapse: collapse; min-width: 1000px; table-layout: fixed; }
+        .gantt-header th { background: #f8f9fa; border: 1px solid #ddd; padding: 10px; font-size: 0.9rem; width: 14%; text-align: center; }
         .gantt-header th:first-child { width: 16%; } 
-
-        .gantt-row td {
-            border: 1px solid #eee;
-            padding: 0; /* 修正：移除 padding 以確保計算精確 */
-            height: 40px;
-            position: relative;
-        }
-        .task-name { 
-            font-weight: bold; 
-            padding-left: 10px !important; 
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        /* Bar Container 佔據後 6 欄 (84%) */
-        .bar-container-cell {
-            width: 84%; 
-            position: relative;
-        }
-
-        .bar {
-            height: 24px;
-            border-radius: 4px;
-            position: absolute;
-            top: 8px;
-            color: white;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            padding-left: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-            transition: width 1s ease-out;
-            width: 0;
-            z-index: 10;
-        }
+        .gantt-row td { border: 1px solid #eee; padding: 0; height: 40px; position: relative; }
+        .task-name { font-weight: bold; padding-left: 10px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bar-container-cell { width: 84%; position: relative; }
+        .bar { height: 24px; border-radius: 4px; position: absolute; top: 8px; color: white; font-size: 0.8rem; display: flex; align-items: center; padding-left: 10px; white-space: nowrap; overflow: hidden; box-shadow: 1px 1px 3px rgba(0,0,0,0.2); transition: width 1s ease-out; width: 0; z-index: 10; }
         .bar-pcm { background: var(--role-pcm); }
         .bar-super { background: var(--role-super); }
         .bar-const { background: var(--role-const); }
-        .milestone { 
-            background: #e74c3c; 
-            width: 20px; height: 20px; 
-            transform: rotate(45deg); 
-            top: 10px; 
-            margin-left: -10px; /* Center the diamond on the date */
-        }
+        .milestone { background: #e74c3c; width: 20px; height: 20px; transform: rotate(45deg); top: 10px; margin-left: -10px; }
+        .grid-line { position: absolute; top: 0; bottom: 0; border-right: 1px dashed #eee; z-index: 0; }
 
-        /* Grid Lines for Gantt */
-        .grid-line {
-            position: absolute;
-            top: 0; bottom: 0;
-            border-right: 1px dashed #eee;
-            z-index: 0;
-        }
+        /* --- Network Styles --- */
+        #network-viz { width: 100%; height: 600px; border: 1px solid #ddd; background: #fafafa; }
 
-        /* --- 2. Network Diagram Styles --- */
-        #network-viz {
-            width: 100%;
-            height: 600px;
-            border: 1px solid #ddd;
-            background: #fafafa;
-        }
-
-        /* --- 3. RACI Matrix Styles --- */
-        .raci-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 1rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .raci-table th, .raci-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: center;
-        }
-        .raci-table th {
-            background-color: var(--primary);
-            color: white;
-            font-weight: bold;
-        }
+        /* --- RACI Styles --- */
+        .raci-table { width: 100%; border-collapse: collapse; font-size: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .raci-table th, .raci-table td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        .raci-table th { background-color: var(--primary); color: white; font-weight: bold; }
         .raci-table tr:nth-child(even) { background-color: #f9f9f9; }
         .col-task { text-align: left !important; font-weight: bold; width: 30%; }
         .symbol-A { color: #c0392b; font-weight: 900; font-size: 1.2rem; }
@@ -199,75 +116,78 @@
         .symbol-C { color: #2980b9; font-weight: bold; }
         .symbol-I { color: #7f8c8d; }
 
-        /* --- 4. Timeline Styles (Fixed) --- */
-        .timeline-container {
-            position: relative;
-            margin: 40px 0;
-            padding: 20px 0;
-            overflow-x: auto;
+        /* --- Timeline Styles (Fixed for v4.1) --- */
+        .timeline-container { 
+            position: relative; 
+            margin: 20px 0; 
+            /* 修正重點：增加上下 Padding，撐開高度以容納標籤 */
+            padding: 60px 0; 
+            overflow-x: auto; 
+            /* 修正重點：隱藏垂直捲軸 */
+            overflow-y: hidden; 
         }
-        .timeline-line {
-            height: 4px;
-            background: #bdc3c7;
-            width: 90%; /* 使用相對寬度 */
-            max-width: 1200px;
-            position: relative;
-            top: 20px;
-            margin: 0 auto;
+        .timeline-line { 
+            height: 4px; 
+            background: #bdc3c7; 
+            width: 90%; 
+            max-width: 1200px; 
+            position: relative; 
+            /* 修正重點：讓線條在 Padding 區域內垂直置中 */
+            top: 0; 
+            margin: 0 auto; 
         }
-        .timeline-point {
-            position: absolute;
-            top: -8px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--accent);
-            border: 4px solid white;
-            box-shadow: 0 0 5px rgba(0,0,0,0.3);
-            cursor: pointer;
-            transition: 0.3s;
+        .timeline-point { 
+            position: absolute; 
+            top: -8px; 
+            width: 20px; 
+            height: 20px; 
+            border-radius: 50%; 
+            background: var(--accent); 
+            border: 4px solid white; 
+            box-shadow: 0 0 5px rgba(0,0,0,0.3); 
+            cursor: pointer; 
+            transition: 0.3s; 
         }
         .timeline-point:hover { transform: scale(1.2); background: #e74c3c; }
-        .point-label {
-            position: absolute;
-            top: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            text-align: center;
-            font-size: 0.9rem;
-            font-weight: bold;
+        .point-label { 
+            position: absolute; 
+            top: 30px; /* 標籤在點下方 */
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 150px; 
+            text-align: center; 
+            font-size: 0.9rem; 
+            font-weight: bold; 
         }
-        .point-date {
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.85rem;
-            color: #7f8c8d;
-            white-space: nowrap;
+        .point-date { 
+            position: absolute; 
+            top: -30px; /* 日期在點上方 */
+            left: 50%; 
+            transform: translateX(-50%); 
+            font-size: 0.85rem; 
+            color: #7f8c8d; 
+            white-space: nowrap; 
         }
 
+        /* --- Specs & Details Styles --- */
+        .spec-section { margin-bottom: 30px; border: 1px solid #ddd; border-radius: 8px; padding: 20px; }
+        .spec-title { font-size: 1.2rem; font-weight: bold; color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 15px; }
+        .spec-list { list-style: none; padding: 0; }
+        .spec-list li { padding: 8px 0; border-bottom: 1px dashed #eee; display: flex; justify-content: space-between; }
+        .spec-key { font-weight: bold; color: #555; }
+        .spec-val { color: #333; }
+        .code-block { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; font-family: monospace; overflow-x: auto; font-size: 0.9rem; }
+
         /* Control Panel */
-        .controls {
-            padding: 20px;
-            background: #f1f3f5;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid #ddd;
-        }
-        .btn-next {
-            background: var(--accent); color: white; border: none; padding: 10px 20px;
-            border-radius: 5px; cursor: pointer; font-size: 1rem;
-        }
+        .controls { padding: 20px; background: #f1f3f5; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #ddd; }
+        .btn-next { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>PCM 電子簽章專案管理儀表板 v3.2</h1>
+        <h1>PCM 電子簽章專案管理儀表板 v4.1</h1>
         <div class="header-info">
             啟動: 2026/01/23 | 決標: 2026/04/20 | 上線: 2026/05/18
         </div>
@@ -277,7 +197,7 @@
         <div class="tab active" onclick="switchTab('dashboard')">📊 專案總覽</div>
         <div class="tab" onclick="switchTab('network')">🕸️ 網狀圖</div>
         <div class="tab" onclick="switchTab('raci')">⚖️ 權責矩陣</div>
-        <div class="tab" onclick="switchTab('strategy')">📝 啟動策略</div>
+        <div class="tab" onclick="switchTab('specs')">📂 執行細節與規範</div>
         <div class="tab" onclick="switchTab('flow')">🔄 流程模擬</div>
     </div>
 
@@ -291,7 +211,7 @@
 </div>
 
 <script>
-    // --- Data: Schedule (修正邏輯斷點) ---
+    // --- Data: Schedule ---
     const tasks = [
         { id: 1, name: "專案啟動與規範制定 (BEP)", start: "2026-01-23", dur: 14, role: "pcm", type: "task" },
         { id: 2, name: "電子簽章納入招標文件", start: "2026-01-23", dur: 10, role: "pcm", type: "task" },
@@ -300,25 +220,21 @@
         { id: 5, name: "廠商決標 / 開工", start: "2026-04-20", dur: 1, role: "milestone", type: "milestone" },
         { id: 6, name: "廠商採購軟體與憑證辦理", start: "2026-04-21", dur: 14, role: "const", type: "task" },
         { id: 7, name: "系統整合測試 (SIT)", start: "2026-05-05", dur: 7, role: "const", type: "task" },
-        // 修正：增加 UAT 驗收作業，填補 5/12-5/18 的空窗
         { id: 7.5, name: "使用者驗收 (UAT) 與行政簽核", start: "2026-05-12", dur: 6, role: "pcm", type: "task" },
         { id: 8, name: "正式上線 (Go-Live)", start: "2026-05-18", dur: 5, role: "pcm", type: "task" }
     ];
 
-    // --- Helper: Calculate Percentage for Timeline ---
     function getTimelinePercent(dateStr) {
         const start = new Date("2026-01-01").getTime();
         const end = new Date("2026-06-30").getTime();
         const current = new Date(dateStr).getTime();
-        const total = end - start;
-        const pos = current - start;
-        return (pos / total) * 100;
+        return ((current - start) / (end - start)) * 100;
     }
 
     // --- HTML Templates ---
 
     const dashboardHTML = `
-        <h3>📅 關鍵里程碑時間軸 (Timeline - 精確計算版)</h3>
+        <h3>📅 關鍵里程碑時間軸 (Timeline)</h3>
         <div class="timeline-container">
             <div class="timeline-line">
                 <div class="timeline-point" style="left: ${getTimelinePercent('2026-01-23')}%;" title="專案啟動">
@@ -335,15 +251,11 @@
                 </div>
             </div>
         </div>
-        
         <h3 style="margin-top:40px;">📆 動態排程甘特圖 (Gantt Chart)</h3>
         <div class="gantt-container">
             <table class="gantt-table">
                 <thead class="gantt-header">
-                    <tr>
-                        <th>工作項目</th>
-                        <th>1月</th><th>2月</th><th>3月</th><th>4月</th><th>5月</th><th>6月</th>
-                    </tr>
+                    <tr><th>工作項目</th><th>1月</th><th>2月</th><th>3月</th><th>4月</th><th>5月</th><th>6月</th></tr>
                 </thead>
                 <tbody id="gantt-body"></tbody>
             </table>
@@ -355,75 +267,68 @@
         </div>
     `;
 
-    const networkHTML = `
-        <h3>🕸️ 專案網狀圖 (PERT Network Diagram)</h3>
-        <p>顯示任務前後依賴關係。可拖曳節點調整視角。</p>
-        <div id="network-viz"></div>
-    `;
+    const networkHTML = `<div id="network-viz"></div>`;
 
     const raciHTML = `
         <h3>⚖️ 電子簽章權責劃分矩陣 (RACI Matrix)</h3>
         <table class="raci-table">
             <thead>
-                <tr>
-                    <th class="col-task">工作項目 (Task)</th>
-                    <th>機關 (Client)</th>
-                    <th>PCM (專案管理)</th>
-                    <th>監造 (Supervision)</th>
-                    <th>施工 (Const.)</th>
-                    <th>備註</th>
-                </tr>
+                <tr><th class="col-task">工作項目</th><th>機關</th><th>PCM</th><th>監造</th><th>施工</th><th>備註</th></tr>
             </thead>
             <tbody>
-                <tr>
-                    <td class="col-task">1. 制度建立與標準制定</td>
-                    <td class="symbol-A">A</td>
-                    <td class="symbol-R">R</td>
-                    <td class="symbol-I">I</td>
-                    <td class="symbol-I">I</td>
-                    <td>PCM 撰寫 BEP/招標規範</td>
-                </tr>
-                <tr>
-                    <td class="col-task">2. 憑證與軟體購置</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td class="symbol-R">R</td>
-                    <td class="symbol-R">R</td>
-                    <td>各單位自行購買</td>
-                </tr>
-                <tr>
-                    <td class="col-task">3. 施工圖/計畫書簽證</td>
-                    <td class="symbol-I">I</td>
-                    <td class="symbol-I">I</td>
-                    <td class="symbol-C">C</td>
-                    <td class="symbol-A">A / R</td>
-                    <td>技師必須親自插卡</td>
-                </tr>
-                <tr>
-                    <td class="col-task">4. 監工日報表簽證</td>
-                    <td class="symbol-I">I</td>
-                    <td class="symbol-I">I</td>
-                    <td class="symbol-R">R</td>
-                    <td class="symbol-R">R</td>
-                    <td>優先推動項目</td>
-                </tr>
+                <tr><td class="col-task">1. 制度建立與標準制定</td><td class="symbol-A">A</td><td class="symbol-R">R</td><td class="symbol-I">I</td><td class="symbol-I">I</td><td>PCM 撰寫 BEP</td></tr>
+                <tr><td class="col-task">2. 憑證與軟體購置</td><td>-</td><td>-</td><td class="symbol-R">R</td><td class="symbol-R">R</td><td>各單位自行購買</td></tr>
+                <tr><td class="col-task">3. 施工圖/計畫書簽證</td><td class="symbol-I">I</td><td class="symbol-I">I</td><td class="symbol-C">C</td><td class="symbol-A">A / R</td><td>技師必須親自插卡</td></tr>
+                <tr><td class="col-task">4. 監工日報表簽證</td><td class="symbol-I">I</td><td class="symbol-I">I</td><td class="symbol-R">R</td><td class="symbol-R">R</td><td>優先推動項目</td></tr>
             </tbody>
         </table>
-        <div style="margin-top:20px; font-weight:bold; color:#555;">
-            圖例：<span class="symbol-A">A=當責/核定</span>, <span class="symbol-R">R=主辦/執行</span>, <span class="symbol-C">C=協辦/審核</span>, <span class="symbol-I">I=告知/備查</span>
-        </div>
     `;
 
-    const strategyHTML = `
-        <div class="strategy-box" style="border: 2px solid #2c3e50; padding: 20px; border-radius: 8px;">
-            <h2>分階段導入策略 (2026/01/23 啟動版)</h2>
-            <div class="alert-box" style="background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin-bottom: 20px;">
-                <b>⚠️ 關鍵戰略：</b>因應 4/20 決標，目前處於「招標準備期」。策略重點在於將電子簽章義務納入合約。
+    const specsHTML = `
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+            <div class="spec-section" style="flex:1; min-width:300px;">
+                <div class="spec-title">🛠️ 硬體與憑證規格 (Hardware Specs)</div>
+                <ul class="spec-list">
+                    <li><span class="spec-key">憑證類型 (Certificate)</span> <span class="spec-val">HCA 2.0 (工商憑證) 或 MOICA (自然人憑證)</span></li>
+                    <li><span class="spec-key">讀卡機 (Reader)</span> <span class="spec-val">符合 PC/SC 標準之晶片讀卡機</span></li>
+                    <li><span class="spec-key">加密演算法 (Algo)</span> <span class="spec-val">RSA 2048 bits 或以上</span></li>
+                    <li><span class="spec-key">雜湊演算法 (Hash)</span> <span class="spec-val">SHA-256 (嚴禁使用 SHA-1)</span></li>
+                </ul>
             </div>
-            <ul>
-                <li><b>第一階段 (1/23 - 4/19)</b>：PCM 制定 BEP，監造先行建置。</li>
-                <li><b>第二階段 (4/20 - 5/18)</b>：廠商進場動員，採購軟體，進行整合測試。</li>
-            </ul>
+            <div class="spec-section" style="flex:1; min-width:300px;">
+                <div class="spec-title">💻 軟體與格式要求 (Software Specs)</div>
+                <ul class="spec-list">
+                    <li><span class="spec-key">檔案格式 (Format)</span> <span class="spec-val">PDF 1.7 (ISO 32000-1)</span></li>
+                    <li><span class="spec-key">簽章標準 (Standard)</span> <span class="spec-val">PAdES (PDF Advanced Electronic Signatures)</span></li>
+                    <li><span class="spec-key">時戳服務 (Timestamp)</span> <span class="spec-val">需介接中華電信或關貿網路 TSA</span></li>
+                    <li><span class="spec-key">長期驗證 (LTV)</span> <span class="spec-val">必須嵌入撤銷清單 (CRL/OCSP)</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="spec-section">
+            <div class="spec-title">📝 招標文件條款範本 (Tender Clause Template)</div>
+            <p>請將以下條款納入「施工規範 - 一般條款」章節：</p>
+            <div class="code-block">
+第 01300 章 - 文書送審與電子化作業
+1. 承包商應於開工後 14 日內，備妥符合電子簽章法規定之硬體與憑證。
+2. 所有提送之計畫書、施工圖、日報表，均須採用 PDF 電子簽章格式提送。
+3. 電子簽章必須包含有效之時戳 (Timestamp)，並確保簽章當下憑證未被撤銷。
+4. 專任工程人員 (技師) 之簽章，必須由本人親自持卡操作，嚴禁借卡代簽。
+            </div>
+        </div>
+
+        <div class="spec-section">
+            <div class="spec-title">🔄 技師簽章標準作業程序 (SOP)</div>
+            <ol style="line-height:1.8;">
+                <li><b>Step 1:</b> 將施工圖轉檔為 PDF，確認內容無誤。</li>
+                <li><b>Step 2:</b> 插入晶片卡 (HCA/MOICA) 至讀卡機。</li>
+                <li><b>Step 3:</b> 開啟簽章軟體，選擇「可見簽章 (Visible Signature)」。</li>
+                <li><b>Step 4:</b> 拖曳簽名外觀至圖框簽核欄位。</li>
+                <li><b>Step 5:</b> 輸入 PIN 碼進行私鑰運算 (Private Key Operation)。</li>
+                <li><b>Step 6:</b> 系統自動連線 TSA 取得時戳並嵌入檔案。</li>
+                <li><b>Step 7:</b> 上傳至 CDE 平台。</li>
+            </ol>
         </div>
     `;
 
@@ -446,8 +351,8 @@
             setTimeout(renderNetwork, 100);
         } else if (tabName === 'raci') {
             contentDiv.innerHTML = raciHTML;
-        } else if (tabName === 'strategy') {
-            contentDiv.innerHTML = strategyHTML;
+        } else if (tabName === 'specs') {
+            contentDiv.innerHTML = specsHTML;
         } else if (tabName === 'flow') {
             contentDiv.innerHTML = '<div id="flow-viz" style="padding:20px; font-size:1.2rem; line-height:1.6;">請點擊下一步開始流程模擬...</div>';
             controls.classList.remove('hidden');
@@ -455,7 +360,6 @@
         }
     }
 
-    // --- Gantt Render Logic (Fixed) ---
     function renderGantt() {
         const tbody = document.getElementById('gantt-body');
         const startDate = new Date("2026-01-01").getTime();
@@ -464,47 +368,27 @@
 
         tasks.forEach(task => {
             const taskStart = new Date(task.start).getTime();
-            // 計算相對於 1/1 的百分比
             const left = ((taskStart - startDate) / totalTime) * 100;
-            // 計算持續時間的百分比 (1天 = 24*60*60*1000)
             const width = (task.dur * 86400000 / totalTime) * 100;
-
             const tr = document.createElement('tr');
             tr.className = 'gantt-row';
             
-            let barHTML = '';
-            if (task.type === 'milestone') {
-                barHTML = `<div class="bar milestone" style="left:${left}%;" title="${task.name} (${task.start})"></div>`;
-            } else {
-                barHTML = `<div class="bar bar-${task.role}" style="left:${left}%; width:0%;" data-final-width="${width}%" title="${task.name}: ${task.dur}天">
-                    ${task.name}
-                </div>`;
-            }
+            let barHTML = task.type === 'milestone' 
+                ? `<div class="bar milestone" style="left:${left}%;" title="${task.name}"></div>`
+                : `<div class="bar bar-${task.role}" style="left:${left}%; width:0%;" data-final-width="${width}%" title="${task.name}">${task.name}</div>`;
 
-            // 增加背景格線 (Grid Lines)
             let gridLines = '';
-            for(let i=1; i<6; i++) {
-                gridLines += `<div class="grid-line" style="left: ${i * 16.66}%"></div>`;
-            }
+            for(let i=1; i<6; i++) gridLines += `<div class="grid-line" style="left: ${i * 16.66}%"></div>`;
 
-            tr.innerHTML = `
-                <td class="task-name">${task.name}</td>
-                <td colspan="6" class="bar-container-cell">
-                    ${gridLines}
-                    ${barHTML}
-                </td>
-            `;
+            tr.innerHTML = `<td class="task-name">${task.name}</td><td colspan="6" class="bar-container-cell">${gridLines}${barHTML}</td>`;
             tbody.appendChild(tr);
         });
 
         setTimeout(() => {
-            document.querySelectorAll('.bar').forEach(bar => {
-                if(bar.dataset.finalWidth) bar.style.width = bar.dataset.finalWidth;
-            });
+            document.querySelectorAll('.bar').forEach(bar => { if(bar.dataset.finalWidth) bar.style.width = bar.dataset.finalWidth; });
         }, 100);
     }
 
-    // --- Network (vis.js) Render Logic ---
     function renderNetwork() {
         var nodes = new vis.DataSet([
             {id: 1, label: '1.專案啟動\n(1/23)', group: 'pcm'},
@@ -517,22 +401,13 @@
             {id: 7.5, label: '7.5.UAT驗收\n(5/12)', group: 'pcm'},
             {id: 8, label: '8.正式上線\n(5/18)', shape: 'star', color: '#f1c40f'}
         ]);
-
         var edges = new vis.DataSet([
-            {from: 1, to: 2, arrows:'to'},
-            {from: 1, to: 3, arrows:'to'},
-            {from: 1, to: 4, arrows:'to'},
-            {from: 2, to: 5, arrows:'to', label: '等待決標'},
-            {from: 5, to: 6, arrows:'to'},
-            {from: 3, to: 7, arrows:'to', label: '監造就緒'},
-            {from: 4, to: 7, arrows:'to', label: '平台就緒'},
-            {from: 6, to: 7, arrows:'to'},
-            {from: 7, to: 7.5, arrows:'to'},
-            {from: 7.5, to: 8, arrows:'to'}
+            {from: 1, to: 2, arrows:'to'}, {from: 1, to: 3, arrows:'to'}, {from: 1, to: 4, arrows:'to'},
+            {from: 2, to: 5, arrows:'to', label: '等待決標'}, {from: 5, to: 6, arrows:'to'},
+            {from: 3, to: 7, arrows:'to', label: '監造就緒'}, {from: 4, to: 7, arrows:'to', label: '平台就緒'},
+            {from: 6, to: 7, arrows:'to'}, {from: 7, to: 7.5, arrows:'to'}, {from: 7.5, to: 8, arrows:'to'}
         ]);
-
         var container = document.getElementById('network-viz');
-        var data = { nodes: nodes, edges: edges };
         var options = {
             layout: { hierarchical: { direction: "LR", sortMethod: "directed" } },
             groups: {
@@ -542,10 +417,9 @@
             },
             physics: false
         };
-        new vis.Network(container, data, options);
+        new vis.Network(container, {nodes, edges}, options);
     }
 
-    // --- Flow Simulation Logic ---
     const flowSteps = [
         "1. PCM 啟動專案，發文通知各單位 (1/23)",
         "2. 修改招標文件，加入電子簽章條款 (1/30)",
@@ -579,7 +453,6 @@
     }
 
     switchTab('dashboard');
-
 </script>
 
 </body>
